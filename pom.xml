@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <!--<parent>-->
-        <!--<artifactId>gwt-material-parent</artifactId>-->
-        <!--<groupId>com.github.gwtmaterialdesign</groupId>-->
-        <!--<version>1.5.0</version>-->
-    <!--</parent>-->
+    <parent>
+        <artifactId>gwt-material-parent</artifactId>
+        <groupId>com.github.gwtmaterialdesign.trecube</groupId>
+        <version>1.5.0</version>
+    </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>gwt-material-addins</artifactId>
+    <groupId>com.github.gwtmaterialdesign.trecube</groupId>
+    <version>1.5.1-SNAPSHOT</version>
 
     <name>Gwt Material Addins</name>
     <description>Extra Components of GWT Material Framework</description>
-    <version>1.5.0-SNAPSHOT</version>
-    <groupId>com.github.gwtmaterialdesign</groupId>
 
     <properties>
         <gwt-material.version>1.5.0</gwt-material.version>
@@ -29,7 +29,7 @@
         <dependency>
             <groupId>com.google.gwt</groupId>
             <artifactId>gwt-user</artifactId>
-            <version>2.7.0</version>
+            <version>${gwt.version}</version>
             <scope>provided</scope>
         </dependency>
         <!-- Testing -->

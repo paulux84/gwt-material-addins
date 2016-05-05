@@ -26,7 +26,6 @@ import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.core.client.ScriptInjector;
 import com.google.gwt.dom.client.*;
 import com.google.gwt.resources.client.TextResource;
-import gwt.material.design.client.ui.MaterialToast;
 
 /**
  * Resource Injector for injecting external resources such as javascript and css files.
@@ -58,11 +57,11 @@ public class MaterialResourceInjector {
     }-*/;
 
     public static void injectJs(TextResource resource) {
-        injectJs(resource, true, false, true);
+        injectJs(resource, true, false, false);
     }
 
     public static void injectDebugJs(TextResource resource) {
-        injectJs(resource, false, true, true);
+        injectJs(resource, false, true, false);
     }
 
     public static void injectJs(TextResource resource, final boolean removeTag, boolean sourceUrl, boolean isScheduleDeferred) {
@@ -72,7 +71,6 @@ public class MaterialResourceInjector {
         if(isScheduleDeferred) {
             Scheduler.get().scheduleDeferred(new Scheduler.ScheduledCommand() {
 
-                @Override
                 public void execute() {
                     // Inject the script resource
                     ScriptInjector.fromString(text)

@@ -1,6 +1,6 @@
 package gwt.material.design.addins.client.datetimepicker;
 
-import com.google.gwt.dom.client.Document;
+import com.google.gwt.core.client.JsDate;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
@@ -9,10 +9,7 @@ import com.google.gwt.user.client.ui.HasValue;
 import gwt.material.design.addins.client.MaterialResourceInjector;
 import gwt.material.design.client.base.HasError;
 import gwt.material.design.client.base.HasPlaceholder;
-import gwt.material.design.client.base.MaterialWidget;
-import gwt.material.design.client.constants.InputType;
-import gwt.material.design.client.ui.MaterialPanel;
-import gwt.material.design.client.ui.MaterialTextBox;
+import gwt.material.design.client.ui.MaterialValueBox;
 
 import java.util.Date;
 
@@ -57,7 +54,7 @@ import java.util.Date;
  * @author Ben Dol
  */
 //@formatter:on
-public class MaterialDateTimePicker extends MaterialWidget implements HasError, HasPlaceholder, HasValue<Date> {
+public class MaterialDateTimePicker extends MaterialValueBox<Date> implements HasError, HasPlaceholder, HasValue<Date> {
 
     static {
         if(MaterialResourceInjector.isDebug()) {
@@ -70,12 +67,6 @@ public class MaterialDateTimePicker extends MaterialWidget implements HasError, 
             MaterialResourceInjector.injectCss(MaterialDateTimePickerClientBundle.INSTANCE.dateTimepickerCss());
         }
     }
-
-    /** Wraps the actual input. */
-    private MaterialPanel panel = new MaterialPanel();
-
-    private MaterialTextBox input = new MaterialTextBox();
-
 
     /** The current value held by the time picker. */
     private Date time;
@@ -98,18 +89,6 @@ public class MaterialDateTimePicker extends MaterialWidget implements HasError, 
 
 
     public MaterialDateTimePicker() {
-        super(Document.get().createDivElement());
-        this.input.setType(InputType.TEXT);
-        this.panel.add(this.input);
-
-        this.add(this.panel);
-
-    }
-
-    @Override
-    protected void onLoad() {
-        super.onLoad();
-        this.input.getElement().setAttribute("type", "text");
         this.initTimePicker();
     }
 
@@ -133,32 +112,9 @@ public class MaterialDateTimePicker extends MaterialWidget implements HasError, 
         return this.placeholder;
     }
 
-    /**
-     * @param placeholder
-     *            The placeholder text to set.
-     */
-    @Override
-    public void setPlaceholder(String placeholder) {
-        input.setPlaceholder(placeholder);
-    }
-
-    @Override
-    public void setError(String error) {
-        this.input.setError(error);
-    }
-
-    @Override
-    public void setSuccess(String success) {
-        this.input.setSuccess(success);
-    }
-
-    @Override
-    public void clearErrorOrSuccess() {
-        this.input.clearErrorOrSuccess();
-    }
 
     public void initTimePicker() {
-        this.initTimePicker(this.input.getElement());
+        this.initTimePicker(this.getElement());
         timePickerInit=true;
     }
 
@@ -180,13 +136,13 @@ public class MaterialDateTimePicker extends MaterialWidget implements HasError, 
             });
 
             dateTimePicker.on('change', function(e, date){
-                that.@gwt.material.design.addins.client.datetimepicker.MaterialDateTimePicker::onChange(*)(date);
+                that.@gwt.material.design.addins.client.datetimepicker.MaterialDateTimePicker::onChange(*)(date.toDate());
             });
             dateTimePicker.on('beforeChange', function(e, date){
-                that.@gwt.material.design.addins.client.datetimepicker.MaterialDateTimePicker::onBeforeChange(*)(date);
+                that.@gwt.material.design.addins.client.datetimepicker.MaterialDateTimePicker::onBeforeChange(*)(date.toDate());
             });
             dateTimePicker.on('dateSelected', function(e, date){
-                that.@gwt.material.design.addins.client.datetimepicker.MaterialDateTimePicker::onDateSelected(*)(date);
+                that.@gwt.material.design.addins.client.datetimepicker.MaterialDateTimePicker::onDateSelected(*)(date.toDate());
             });
 
         });
@@ -286,25 +242,20 @@ public class MaterialDateTimePicker extends MaterialWidget implements HasError, 
     //endregionget
 
     //region events
-    protected void onBeforeChange(Date date){
+    protected void onBeforeChange(JsDate date){
 
     }
 
-    protected void onChange(Date date){
-        this.time=date;
+    protected void onChange(JsDate date){
+        this.time = new Date((long) date.getTime());
         this.fireValueChangeEvent();
     }
 
-    protected void onDateSelected(Date date){
+    protected void onDateSelected(JsDate date){
 
     }
     //endregion
 
-
-    @Override
-    public void setEnabled(boolean enabled) {
-        this.input.setEnabled(enabled);
-    }
     
     private void fireValueChangeEvent() {
         ValueChangeEvent.fire(this, this.time);
@@ -312,7 +263,7 @@ public class MaterialDateTimePicker extends MaterialWidget implements HasError, 
 
     @Override
     public void clear() {
-        this.clearTimePickerValue(this.input.getElement());
+        this.clearTimePickerValue(this.getElement());
     }
 
     private native void clearTimePickerValue(Element e) /*-{
@@ -329,22 +280,48 @@ public class MaterialDateTimePicker extends MaterialWidget implements HasError, 
         return this.time;
     }
 
-    private static native Date getUtcDateTime(String dateTimeString, String format)/*-{
+    private static native JsDate getUtcDateTime(String dateTimeString, String format)/*-{
         return $wnd.moment(dateTimeString, format).utc().toDate();
     }-*/;
 
-    private static native String formatDate(Date date, String format)/*-{
+    private static native String formatDate(JsDate date, String format)/*-{
         return $wnd.moment(date).format(format);
     }-*/;
 
-    private static native void setDateTimePickerDate(Element e , Date date)/*-{
+    private static native void setDateTimePickerDate(Element e , JsDate date)/*-{
         $wnd.jQuery(e).bootstrapMaterialDatePicker('setDate', date)
     }-*/;
+
+    private static native void setMinDate(Element e , JsDate date)/*-{
+        $wnd.jQuery(e).bootstrapMaterialDatePicker('setMinDate', date)
+    }-*/;
+
+    private static native void setMaxDate(Element e , JsDate date)/*-{
+        $wnd.jQuery(e).bootstrapMaterialDatePicker('setMaxDate', date)
+    }-*/;
+
+
+    public void setMaxDate(Date date){
+        setMaxDate(this.getElement(),convertDate(date));
+    }
+
+    public void setMinDate(Date date){
+        setMinDate(this.getElement(),convertDate(date));
+    }
+
+    public void setFromToday(boolean fromToday){
+        if(fromToday)
+            setMinDate(new Date());
+    }
 
 
     @Override
     public void setValue(Date time) {
        this.setValue(time, true);
+    }
+
+    private JsDate convertDate(Date date){
+        return JsDate.create((double) date.getTime());
     }
 
     @Override
@@ -361,11 +338,12 @@ public class MaterialDateTimePicker extends MaterialWidget implements HasError, 
         }
 
         this.time = dateTime;
+        JsDate jsDate = convertDate(dateTime);
 
-        this.setValue(this.input.getElement(), formatDate(dateTime,format));
+        this.setValue(this.getElement(), formatDate(jsDate,format));
 
         if(isTimePickerInit())
-            setDateTimePickerDate(this.getElement(), dateTime);
+            setDateTimePickerDate(this.getElement(), jsDate);
 
         if(fireEvents == true) {
             this.fireValueChangeEvent();

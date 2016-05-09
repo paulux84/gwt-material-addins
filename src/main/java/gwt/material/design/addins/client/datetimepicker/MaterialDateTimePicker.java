@@ -1,6 +1,7 @@
 package gwt.material.design.addins.client.datetimepicker;
 
 import com.google.gwt.core.client.JsDate;
+import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
@@ -9,7 +10,8 @@ import com.google.gwt.user.client.ui.HasValue;
 import gwt.material.design.addins.client.MaterialResourceInjector;
 import gwt.material.design.client.base.HasError;
 import gwt.material.design.client.base.HasPlaceholder;
-import gwt.material.design.client.ui.MaterialValueBox;
+import gwt.material.design.client.base.MaterialWidget;
+import gwt.material.design.client.ui.MaterialTextBox;
 
 import java.util.Date;
 
@@ -54,7 +56,7 @@ import java.util.Date;
  * @author Ben Dol
  */
 //@formatter:on
-public class MaterialDateTimePicker extends MaterialValueBox<Date> implements HasError, HasPlaceholder, HasValue<Date> {
+public class MaterialDateTimePicker extends MaterialWidget implements HasError, HasPlaceholder, HasValue<Date> {
 
     static {
         if(MaterialResourceInjector.isDebug()) {
@@ -68,6 +70,9 @@ public class MaterialDateTimePicker extends MaterialValueBox<Date> implements Ha
         }
     }
 
+    private MaterialTextBox textBox = new MaterialTextBox();
+    private Element dateTimePickerInputElement;
+
     /** The current value held by the time picker. */
     private Date time;
 
@@ -76,7 +81,7 @@ public class MaterialDateTimePicker extends MaterialValueBox<Date> implements Ha
     private boolean shortTime = false;
     private boolean showDate = true;
     private boolean showTime = true;
-    private boolean clearButton = true;
+    private boolean clearButton = false;
     private boolean nowButton = true;
     private boolean switchOnClick = false;
     private String cancelText = "Cancel";
@@ -89,7 +94,15 @@ public class MaterialDateTimePicker extends MaterialValueBox<Date> implements Ha
 
 
     public MaterialDateTimePicker() {
+        super(Document.get().createDivElement());
+        dateTimePickerInputElement = textBox.asGwtValueBoxBase().getElement();
+        this.add(this.textBox);
         this.initTimePicker();
+    }
+
+    @Override
+    protected void onLoad() {
+        super.onLoad();
     }
 
     /**
@@ -109,12 +122,45 @@ public class MaterialDateTimePicker extends MaterialValueBox<Date> implements Ha
      */
     @Override
     public String getPlaceholder() {
-        return this.placeholder;
+        return this.textBox.getPlaceholder();
     }
 
+    @Override
+    public void addStyleName(String style) {
+        textBox.addStyleName(style);
+    }
+
+    @Override
+    public void setStyleName(String style) {
+        textBox.setStyleName(style);
+    }
+
+    /**
+     * @param placeholder
+     *            The placeholder text to set.
+     */
+    @Override
+    public void setPlaceholder(String placeholder) {
+        textBox.setPlaceholder(placeholder);
+    }
+
+    @Override
+    public void setError(String error) {
+        this.textBox.setError(error);
+    }
+
+    @Override
+    public void setSuccess(String success) {
+        this.textBox.setSuccess(success);
+    }
+
+    @Override
+    public void clearErrorOrSuccess() {
+        this.textBox.clearErrorOrSuccess();
+    }
 
     public void initTimePicker() {
-        this.initTimePicker(this.getElement());
+        this.initTimePicker(this.dateTimePickerInputElement);
         timePickerInit=true;
     }
 
@@ -256,6 +302,11 @@ public class MaterialDateTimePicker extends MaterialValueBox<Date> implements Ha
     }
     //endregion
 
+
+    @Override
+    public void setEnabled(boolean enabled) {
+        this.textBox.setEnabled(enabled);
+    }
     
     private void fireValueChangeEvent() {
         ValueChangeEvent.fire(this, this.time);
@@ -263,7 +314,7 @@ public class MaterialDateTimePicker extends MaterialValueBox<Date> implements Ha
 
     @Override
     public void clear() {
-        this.clearTimePickerValue(this.getElement());
+        this.clearTimePickerValue(this.dateTimePickerInputElement);
     }
 
     private native void clearTimePickerValue(Element e) /*-{
@@ -302,11 +353,11 @@ public class MaterialDateTimePicker extends MaterialValueBox<Date> implements Ha
 
 
     public void setMaxDate(Date date){
-        setMaxDate(this.getElement(),convertDate(date));
+        setMaxDate(dateTimePickerInputElement,convertDate(date));
     }
 
     public void setMinDate(Date date){
-        setMinDate(this.getElement(),convertDate(date));
+        setMinDate(dateTimePickerInputElement,convertDate(date));
     }
 
     public void setFromToday(boolean fromToday){
@@ -340,7 +391,9 @@ public class MaterialDateTimePicker extends MaterialValueBox<Date> implements Ha
         this.time = dateTime;
         JsDate jsDate = convertDate(dateTime);
 
-        this.setValue(this.getElement(), formatDate(jsDate,format));
+//        this.setValue(this.dateTimePickerInputElement, formatDate(jsDate,format));
+
+        textBox.setText(formatDate(jsDate,format));
 
         if(isTimePickerInit())
             setDateTimePickerDate(this.getElement(), jsDate);

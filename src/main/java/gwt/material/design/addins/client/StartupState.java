@@ -20,12 +20,11 @@ package gwt.material.design.addins.client;
  * #L%
  */
 
+public class StartupState {
+    public StartupState() {
+    }
 
-import com.google.gwt.core.client.EntryPoint;
-
-public class MaterialAddinsDebug implements EntryPoint {
-
-    public void onModuleLoad() {
-        MaterialResourceInjector.setDebug(true);
+    public static class DebugState extends StartupState {
+        public DebugState() {}
     }
 }

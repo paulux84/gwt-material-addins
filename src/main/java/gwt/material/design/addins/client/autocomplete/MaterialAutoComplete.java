@@ -327,6 +327,10 @@ public class MaterialAutoComplete extends MaterialWidget implements HasError, Ha
         box.setFocus(true);
     }
 
+    public TextBox getTextBox(){
+        return itemBox;
+    }
+
     /**
      * Adding the item value using Material Chips added on auto complete box
      */
